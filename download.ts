@@ -101,7 +101,7 @@ export class DownloadTask {
     if (this.config_) return this.config_
     const default_connection_number = 4
     const max_buffer = 1024 * 1024 * 128
-    let buffer_per_connection = this.file_total_size_ / 4
+    let buffer_per_connection = Math.round(this.file_total_size_ / 4)
     let max_buffer_per_connection = max_buffer / 4
     return {
       connection_number: default_connection_number,
