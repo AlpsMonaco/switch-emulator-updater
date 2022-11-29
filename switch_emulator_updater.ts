@@ -8,15 +8,17 @@ import { DownloadTask } from "./download";
 module log {
   const log_name: string = "updater.log"
   export function Info(s: string) {
-    const now = new Date();
-    s = '[' + now.toISOString() + '] ' + "[INFO] " + s
+    let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    let localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+    s = '[' + localISOTime + '] ' + "[INFO] " + s
     console.log(s)
     appendFile(log_name, s + "\n", () => { })
   }
 
   export function Error(s: string) {
-    const now = new Date();
-    s = '[' + now.toISOString() + '] ' + "[ERROR] " + s
+    let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    let localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+    s = '[' + localISOTime + '] ' + "[ERROR] " + s
     console.error(s)
     appendFile(log_name, s + "\n", () => { })
   }
