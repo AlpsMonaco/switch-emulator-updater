@@ -1,6 +1,7 @@
 import axios, { Axios, AxiosHeaders, AxiosProxyConfig, AxiosResponseHeaders, RawAxiosResponseHeaders } from "axios";
+import { exec } from "child_process";
 import { appendFile } from "fs";
-import { open, writeFile } from "fs/promises";
+import { open, readdir, writeFile } from "fs/promises";
 
 module log {
   const log_name: string = "updater.log"
@@ -123,19 +124,7 @@ async function ParallelDownload(url: string) {
 
 
 (async () => {
-  proxy.SetProxySetting("127.0.0.1", 7890)
-  let res = await axios.get('https://api.github.com/repos/Ryujinx/release-channel-master/releases/latest',
-    { proxy: proxy.GetProxySetting() }
-  )
-  let version = res.data.tag_name
-  const target_package_name: string = "ryujinx-" + version + "-win_x64.zip"
-  for (let asset of res.data.assets) {
-    if (asset.name == target_package_name) {
-      let download_url = asset.browser_download_url
-      await ParallelDownload(download_url)
-      return
-    }
-  }
-  log.Error("no matched assets")
-  // CreateEmptyFile("result.txt", 30 * 1024 * 1024 * 1024)
+  exec("7z x ryujinx-1.1.394-win_x64.zip -y -oE:\\Games\\Ryujinx", (...args) => {
+    console.log(args)
+  })
 })()

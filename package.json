@@ -1,9 +1,7 @@
 {
   "dependencies": {
     "@types/node": "^18.11.9",
-    "@types/node-7z": "^2.1.4",
     "axios": "^1.2.0",
-    "find-process": "^1.4.7",
-    "node-7z": "^3.0.0"
+    "find-process": "^1.4.7"
   }
 }

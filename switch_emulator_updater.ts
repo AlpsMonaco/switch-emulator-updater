@@ -1,8 +1,8 @@
 import axios from "axios"
+import { exec, ExecException } from "child_process";
 import find from "find-process";
 import { appendFile } from "fs";
-import { readFile, writeFile } from "fs/promises";
-import { extractFull } from "node-7z";
+import { readdir, readFile, unlink, writeFile } from "fs/promises";
 import { DownloadTask } from "./download";
 
 module log {
@@ -49,6 +49,20 @@ module history {
   }
 }
 
+function DecompressFile(src_file: string, dst_directory: string) {
+  return new Promise<string>(
+    (resolve, reject) => {
+      exec("7z x " + src_file + " -o" + dst_directory + " -y", (err: ExecException | null, stdout: string, stderr: string) => {
+        if (err) {
+          reject([err, stdout, stderr])
+          return
+        }
+        resolve(stdout)
+      })
+    }
+  )
+}
+
 module proxy {
   let proxy: { host: string, port: number } | false = false
 
@@ -86,10 +100,8 @@ const dst_path = "E:\\Games\\ryujinx";
 
 if (false) {
   (async () => {
-    let res = await find("name", "Ryujinx")
-    for (let o of res) {
-      console.log(o)
-    }
+    let response = await DecompressFile("ryujinx-1.1.394-win_x64.zip", "E:\\Games\\ryujinx")
+    console.log(response)
   })()
 } else {
   (async () => {
@@ -118,9 +130,18 @@ if (false) {
         await task.Start(download_url)
         let file_name = task.GetFileName()
         log.Info("extracting " + file_name)
-        extractFull(file_name, dst_path, { yes: true })
+        await DecompressFile(file_name, dst_path)
         history_data.version = version
         await history.Set(history_data)
+        let dir_list = await readdir("./")
+        log.Info("cleaning...")
+        for (let file_name of dir_list) {
+          let file_ext = file_name.split('.').pop();
+          if (file_ext == "zip") {
+            log.Info("delete " + file_name)
+            await unlink(file_name)
+          }
+        }
         log.Info("all done,exit")
         return
       }
